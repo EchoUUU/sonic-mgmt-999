@@ -43,7 +43,9 @@ def test_lldp_neighbor(duthosts, enum_rand_one_per_hwsku_frontend_hostname, loca
             ".*ERR syncd#syncd: :- process_on_fdb_event: FDB notification was \
                 not sent since it contain invalid OIDs, bug.*",
         ])
-
+    
+    duthost.shell("docker exec -it pmon service fancontrol restart")
+    duthost.shell("echo  '---------- Err --------------'")
     res = duthost.shell("docker exec -i lldp lldpcli show chassis | grep \"SysDescr:\" | sed -e 's/^\\s*SysDescr:\\s*//g'")
     dut_system_description = res['stdout']
     lldpctl_facts = duthost.lldpctl_facts(asic_instance_id=enum_frontend_asic_index, skip_interface_pattern_list=["eth0", "Ethernet-BP", "Ethernet-IB"])['ansible_facts']

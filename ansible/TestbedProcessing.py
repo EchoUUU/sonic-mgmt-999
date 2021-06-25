@@ -124,7 +124,9 @@ def makeMain(data, outfile):
         "memory": veos.get("memory"),
         "max_fp_num": veos.get("max_fp_num"),
         "ptf_bp_ip": veos.get("ptf_bp_ip"),
-        "ptf_bp_ipv6": veos.get("ptf_bp_ipv6")
+        "ptf_bp_ipv6": veos.get("ptf_bp_ipv6"),
+        "supported_vm_types": veos.get("supported_vm_types"),
+        "sonic_image_filename": veos.get("sonic_image_filename")
     }
     proxy = {
         "proxy_env": {
@@ -150,7 +152,7 @@ def makeVMHostCreds(data, outfile):
     result = {
         "ansible_user": veos.get("vm_host_ansible").get("ansible_user"),
         "ansible_password": veos.get("vm_host_ansible").get("ansible_password"),
-        "ansible_become_pass": veos.get("vm_host_ansible").get("ansible_become_pass")
+        "ansible_become_password": veos.get("vm_host_ansible").get("ansible_become_password")
     }
     with open(outfile, "w") as toWrite:
         toWrite.write("---\n")
@@ -199,7 +201,7 @@ generates /testbed.csv by pulling confName, groupName, topo, ptf_image_name, ptf
 error handling: checks if attribute values are None type or string "None"
 """
 def makeTestbed(data, outfile):
-    csv_columns = "# conf-name,group-name,topo,ptf_image_name,ptf,ptf_ip,ptf_ipv6,server,vm_base,dut,comment"
+    csv_columns = "# conf-name,group-name,topo,ptf_image_name,ptf,ptf_ip,ptf_ipv6,server,vm_base,dut,inv_name,auto_recover,comment"
     topology = data
     csv_file = outfile
 
@@ -217,6 +219,8 @@ def makeTestbed(data, outfile):
                 vm_base = groupDetails.get("vm_base")
                 dut = groupDetails.get("dut")
                 ptf = groupDetails.get("ptf")
+                inv_name = groupDetails.get("inv_name")
+                auto_recover = groupDetails.get("auto_recover")
                 comment = groupDetails.get("comment")
 
                 # catch empty types
@@ -238,10 +242,16 @@ def makeTestbed(data, outfile):
                     dut = ""
                 if not ptf:
                     ptf = ""
+                if not inv_name:
+                    inv_name = ""
+                if not auto_recover:
+                    auto_recover = ""
+                else:
+                    auto_recover = str(auto_recover)
                 if not comment:
                     comment = ""
 
-                row = confName + "," + groupName + "," + topo + "," + ptf_image_name + "," + ptf + "," + ptf_ip + "," + ptf_ipv6 + ","+ server + "," + vm_base + "," + dut + "," + comment
+                row = confName + "," + groupName + "," + topo + "," + ptf_image_name + "," + ptf + "," + ptf_ip + "," + ptf_ipv6 + ","+ server + "," + vm_base + "," + dut + "," + inv_name + "," + auto_recover + "," + comment
                 f.write(row + "\n")
     except IOError:
         print("I/O error: issue creating testbed.csv")
@@ -380,20 +390,20 @@ def makeLab(data, devices, testbed, outfile):
 
                     if "ptf" in key:
                         try: #get ansible host
-                            ansible_host = testbed.get(host).get("ansible").get("ansible_host")
+                            ansible_host = devices.get(host).get("ansible").get("ansible_host")
                             entry += "\tansible_host=" + ansible_host.split("/")[0]
                         except:
                             print("\t\t" + host + ": ansible_host not found")
 
                         if ansible_host:
                             try: # get ansible ssh username
-                                ansible_ssh_user = testbed.get(host.lower()).get("ansible").get("ansible_ssh_user")
+                                ansible_ssh_user = devices.get(host.lower()).get("ansible").get("ansible_ssh_user")
                                 entry += "\tansible_ssh_user=" + ansible_ssh_user
                             except:
                                 print("\t\t" + host + ": ansible_ssh_user not found")
 
                             try: # get ansible ssh pass
-                                ansible_ssh_pass = testbed.get(host.lower()).get("ansible").get("ansible_ssh_pass")
+                                ansible_ssh_pass = devices.get(host.lower()).get("ansible").get("ansible_ssh_pass")
                                 entry += "\tansible_ssh_pass=" + ansible_ssh_pass
                             except:
                                 print("\t\t" + host + ": ansible_ssh_pass not found")
@@ -504,6 +514,10 @@ def updateDockerRegistry(docker_registry, outfile):
             toWrite.write("\n\n")
 
 
+def makeLabconnection_file():
+    import subprocess
+    print(subprocess.call("cd files/ && python creategraph.py -o lab_connection_graph.xml -c None -p None ", shell=True))
+
 def main():
     print("PROCESS STARTED")
     ##############################################################
@@ -572,6 +586,8 @@ def main():
     print("UPDATING FILES FROM CONFIG FILE")
     print("\tUPDATING DOCKER REGISTRY")
     updateDockerRegistry(docker_registry, args.basedir + dockerRegistry_file)
+    print("\t CREATING file lab_connection_graph.xml")
+    makeLabconnection_file()
     print("PROCESS COMPLETED")
 
 
