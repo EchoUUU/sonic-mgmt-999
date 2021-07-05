@@ -10,7 +10,9 @@
         "Arista-VM": "Arista",
         "Nexus-3064-NX": "Nexus",
         "Force10-S6100": "Force10",
-        "Force10-S6000": "Force10"
+        "Force10-S6000": "Force10",
+        "Seastone_2": "Celestica",
+        "Celestica-DX010-C32": "Celestica"
     },
     "switch_login": {
         "Nexus": { 
@@ -24,6 +26,11 @@
             "enable": ["", null]
         },
         "Force10": {
+            "user": "admin",
+            "passwd": ["password"],
+            "enable": ["password"] 
+                    },
+        "Celestica": {
             "user": "admin",
             "passwd": ["password"],
             "enable": ["password"] 
