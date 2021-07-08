@@ -60,7 +60,7 @@ device_groups:
     fanout:
         host: [seastone-fanout]         # source: sonic-mgmt/ansible/lab
     ptf:
-        host: [ptf2,ptf3]                             # source: sonic-mgmt/ansible/lab
+        host: [ptf2,ptf3,ptft1]                             # source: sonic-mgmt/ansible/lab
 
 # devices is a dictionary that contains all devices and hosts but not ptfs (ptfs found under testbed)
 # devices is used to export sonic_lab_devices, fanout/secrets, lab/secrets, lab
@@ -119,8 +119,8 @@ devices:
         mgmt_subnet_mask_length: "24"               
         alias: SDK-SONiC
         credentials:                        
-            username: 
-            password: 
+            username: echowu
+            password: 666666
         ansible:
             ansible_host: 10.251.0.246/24           # source: sonic-mgmt/ansible/files/sonic_lab_devices-github.csv
             ansible_ssh_pass: 666666                # source: sonic-mgmt/ansible/group_vars/lab/secrets.yml
@@ -151,7 +151,19 @@ devices:
         ansible:
             ansible_host: 10.251.0.241/23           # source: sonic-mgmt/ansible/files/sonic_lab_devices-github.csv
             ansible_ssh_user: root                 # source: sonic-mgmt/ansible/group_vars/fanout/secrets.yml
-            ansible_ssh_pass: root              # source: sonic-mgmt/ansible/group_vars/fanout/secrets.yml            
+            ansible_ssh_pass: root              # source: sonic-mgmt/ansible/group_vars/fanout/secrets.yml
+
+    ptft1:                                   #sj
+        device_type: blank                  # source: sonic-mgmt/ansible/files/sonic_lab_devices-github.csv
+        hwsku:                              # source: sonic-mgmt/ansible/files/sonic_lab_devices-github.csv
+        alias:
+        credentials: 
+            username: 
+            password: 
+        ansible:
+            ansible_host: 10.251.0.242/23           # source: sonic-mgmt/ansible/files/sonic_lab_devices-github.csv
+            ansible_ssh_user: root                 # source: sonic-mgmt/ansible/group_vars/fanout/secrets.yml
+            ansible_ssh_pass: root              # source: sonic-mgmt/ansible/group_vars/fanout/secrets.yml                        
 
 # host_vars is a dictionary that contains all host_var values
 # host_vars is used to export the host_vars files
@@ -187,8 +199,8 @@ veos_groups:
             host_var_file: host_vars/STR-ACS-SERV-03.yml    # source: sonic-mgmt/veos            
     eos:
         children: [vms_2, vms_3]                            # sj
-    vms_2:
-        host: [VM0200, VM0201, VM0202, VM0203]              # source: sonic-mgmt/veos
+    vms_2:   
+        host: [VM0100, VM0101, VM0102, VM0103, VM0104, VM0105, VM0106, VM0107, VM0108, VM0109, VM0110, VM0111, VM0112, VM0113, VM0114, VM0115, VM0116, VM0117, VM0118, VM0119, VM0120, VM0121, VM0122, VM0123, VM0124, VM0125, VM0126, VM0127, VM0128, VM0129, VM0130, VM0131, VM0132, VM0133, VM0134, VM0135]              # source: sonic-mgmt/veos
     vms_3:
         host: [VM0300, VM0301, VM0302, VM0303]              # source: sonic-mgmt/veos
     vm_host:
@@ -221,20 +233,84 @@ veos:
         http_proxy: http://10.204.112.11:3128                         # source: sonic-mgmt/ansible/group_vars/vm_host/main.yml
         https_proxy: http://10.204.112.11:3128                        # source: sonic-mgmt/ansible/group_vars/vm_host/main.yml                    
     vm_host_ansible:
-        ansible_user: echowu                                 # source: sonic-mgmt/ansible/group_vars/vm_host/creds.yml
-        ansible_password: 666666                             # source: sonic-mgmt/ansible/group_vars/vm_host/creds.yml
-        ansible_become_password: 666666                            # source: sonic-mgmt/ansible/group_vars/vm_host/creds.yml
+        ansible_user: clsnet                                 # source: sonic-mgmt/ansible/group_vars/vm_host/creds.yml
+        ansible_password: 123456                             # source: sonic-mgmt/ansible/group_vars/vm_host/creds.yml
+        ansible_become_password: 123456                            # source: sonic-mgmt/ansible/group_vars/vm_host/creds.yml
     eos_ansible:
         ansible_user: admin                                 # source: sonic-mgmt/ansible/group_vars/eos/creds.yml
         ansible_password: 123456                             # source: sonic-mgmt/ansible/group_vars/eos/creds.yml
     vms_2:
-        VM0200: 
+        VM0100:
+            ansible_host: 10.251.0.2
+        VM0101:
+            ansible_host: 10.251.0.3
+        VM0102:
+            ansible_host: 10.251.0.4
+        VM0103:
+            ansible_host: 10.251.0.5
+        VM0104:
+            ansible_host: 10.251.0.6
+        VM0105:
+            ansible_host: 10.251.0.7
+        VM0106:
+            ansible_host: 10.251.0.8
+        VM0107:
+            ansible_host: 10.251.0.9
+        VM0108:
+            ansible_host: 10.251.0.10
+        VM0109:
+            ansible_host: 10.251.0.11
+        VM0110:
+            ansible_host: 10.251.0.12
+        VM0111:
+            ansible_host: 10.251.0.13
+        VM0112:
+            ansible_host: 10.251.0.14
+        VM0113:
+            ansible_host: 10.251.0.15
+        VM0114:
+            ansible_host: 10.251.0.16
+        VM0115:
+            ansible_host: 10.251.0.17
+        VM0116:
+            ansible_host: 10.251.0.18
+        VM0117:
+            ansible_host: 10.251.0.19
+        VM0118:
+            ansible_host: 10.251.0.20
+        VM0119:
+            ansible_host: 10.251.0.21
+        VM0120:
+            ansible_host: 10.251.0.22
+        VM0121:
+            ansible_host: 10.251.0.23
+        VM0122:
+            ansible_host: 10.251.0.24
+        VM0123:
+            ansible_host: 10.251.0.25
+        VM0124:
+            ansible_host: 10.251.0.26
+        VM0125:
+            ansible_host: 10.251.0.27
+        VM0126:
+            ansible_host: 10.251.0.28
+        VM0127:
+            ansible_host: 10.251.0.29
+        VM0128:
+            ansible_host: 10.251.0.30
+        VM0129:
+            ansible_host: 10.251.0.31
+        VM0130:
+            ansible_host: 10.251.0.32
+        VM0131:
+            ansible_host: 10.251.0.33
+        VM0132: 
             ansible_host: 10.251.0.51
-        VM0201: 
+        VM0133: 
             ansible_host: 10.251.0.52
-        VM0202: 
+        VM0134: 
             ansible_host: 10.251.0.53
-        VM0203: 
+        VM0135: 
             ansible_host: 10.251.0.54
     vms_3:
         VM0300: 
@@ -257,11 +333,25 @@ testbed:
         ptf_ipv6:
         ptf_ip: 10.251.0.240/23                             # source: sonic-mgmt/ansible/testbed.csv
         server: server_2                                    # source: sonic-mgmt/ansible/testbed.csv
-        vm_base: VM0200                                           # source: sonic-mgmt/ansible/testbed.csv
+        vm_base: VM0132                                           # source: sonic-mgmt/ansible/testbed.csv
         dut: cel-seastone2-01                                 # source: sonic-mgmt/ansible/testbed.csv
         inv_name: lab
         auto_recover: ture
-        comment: Tests CELESTICA SEASTONE2                          # source: sonic-mgmt/ansible/testbed.csv
+        comment: SEASTONE2 T0                          # source: sonic-mgmt/ansible/testbed.csv
+
+    cel_slx_t1:
+        group-name: ptft1                                    # source: sonic-mgmt/ansible/testbed.csv
+        topo: t1                                            # source: sonic-mgmt/ansible/testbed.csv
+        ptf_image_name: docker-ptf                         # source: sonic-mgmt/ansible/testbed.csv
+        ptf: ptft1
+        ptf_ipv6:
+        ptf_ip: 10.251.0.242/23                             # source: sonic-mgmt/ansible/testbed.csv
+        server: server_2                                    # source: sonic-mgmt/ansible/testbed.csv
+        vm_base: VM0100                                           # source: sonic-mgmt/ansible/testbed.csv
+        dut: cel-seastone2-01                                 # source: sonic-mgmt/ansible/testbed.csv
+        inv_name: lab
+        auto_recover: ture
+        comment: SEASTONE2 T1                          # source: sonic-mgmt/ansible/testbed.csv
 
     cel_brixia_t0:
         group-name: ptf3                                    
