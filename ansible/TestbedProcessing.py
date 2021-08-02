@@ -124,7 +124,9 @@ def makeMain(data, outfile):
         "memory": veos.get("memory"),
         "max_fp_num": veos.get("max_fp_num"),
         "ptf_bp_ip": veos.get("ptf_bp_ip"),
-        "ptf_bp_ipv6": veos.get("ptf_bp_ipv6")
+        "ptf_bp_ipv6": veos.get("ptf_bp_ipv6"),
+        "supported_vm_types": veos.get("supported_vm_types"),
+        "sonic_image_filename": veos.get("sonic_image_filename")
     }
     proxy = {
         "proxy_env": {
@@ -133,7 +135,6 @@ def makeMain(data, outfile):
         }
     }
     with open(outfile, "w") as toWrite:
-        toWrite.write( "supported_vm_types: [ 'veos', 'ceos', 'vsonic' ]\n" ),
         yaml.dump(dictData, stream=toWrite, default_flow_style=False)
         toWrite.write("# proxy\n")
         yaml.dump(proxy, stream=toWrite, default_flow_style=False)
@@ -151,7 +152,7 @@ def makeVMHostCreds(data, outfile):
     result = {
         "ansible_user": veos.get("vm_host_ansible").get("ansible_user"),
         "ansible_password": veos.get("vm_host_ansible").get("ansible_password"),
-        "ansible_become_pass": veos.get("vm_host_ansible").get("ansible_become_pass")
+        "ansible_become_password": veos.get("vm_host_ansible").get("ansible_become_password")
     }
     with open(outfile, "w") as toWrite:
         toWrite.write("---\n")
@@ -202,7 +203,7 @@ generates /testbed.csv by pulling confName, groupName, topo, ptf_image_name, ptf
 error handling: checks if attribute values are None type or string "None"
 """
 def makeTestbed(data, outfile):
-    csv_columns = "# conf-name,group-name,topo,ptf_image_name,ptf,ptf_ip,ptf_ipv6,server,vm_base,dut,comment"
+    csv_columns = "# conf-name,group-name,topo,ptf_image_name,ptf,ptf_ip,ptf_ipv6,server,vm_base,dut,inv_name,auto_recover,comment"
     topology = data
     csv_file = outfile
 
@@ -220,6 +221,8 @@ def makeTestbed(data, outfile):
                 vm_base = groupDetails.get("vm_base")
                 dut = groupDetails.get("dut")
                 ptf = groupDetails.get("ptf")
+                inv_name = groupDetails.get("inv_name")
+                auto_recover = groupDetails.get("auto_recover")
                 comment = groupDetails.get("comment")
 
                 # catch empty types
@@ -241,6 +244,12 @@ def makeTestbed(data, outfile):
                     dut = ""
                 if not ptf:
                     ptf = ""
+                if not inv_name:
+                    inv_name = ""
+                if not auto_recover:
+                    auto_recover = ""
+                else:
+                    auto_recover = str(auto_recover)
                 if not comment:
                     comment = ""
                 # dut is a list for multi-dut testbed, convert it to string
@@ -249,7 +258,7 @@ def makeTestbed(data, outfile):
                 dut = dut.replace(",", ";")
                 dut = dut.replace(" ", "")
 
-                row = confName + "," + groupName + "," + topo + "," + ptf_image_name + "," + ptf + "," + ptf_ip + "," + ptf_ipv6 + ","+ server + "," + vm_base + "," + dut + "," + comment
+                row = confName + "," + groupName + "," + topo + "," + ptf_image_name + "," + ptf + "," + ptf_ip + "," + ptf_ipv6 + ","+ server + "," + vm_base + "," + dut + "," + inv_name + "," + auto_recover + "," + comment
                 f.write(row + "\n")
     except IOError:
         print("I/O error: issue creating testbed.csv")
@@ -336,6 +345,12 @@ def makeFanoutSecrets(data, outfile):
         if "fanout" in value.get("device_type").lower():
             result.update({"ansible_ssh_user": value.get("ansible").get("ansible_ssh_user")})
             result.update({"ansible_ssh_pass": value.get("ansible").get("ansible_ssh_pass")})
+            result.update({"fanout_sonic_user": value.get("ansible").get("fanout_sonic_user")})
+            result.update({"fanout_sonic_password": value.get("ansible").get("fanout_sonic_password")})
+            result.update({"fanout_network_user": value.get("ansible").get("fanout_network_user")})
+            result.update({"fanout_network_password": value.get("ansible").get("fanout_network_password")})
+            result.update({"fanout_shell_user": value.get("ansible").get("fanout_shell_user")})
+            result.update({"fanout_shell_password": value.get("ansible").get("fanout_shell_password")})
 
     with open(outfile, "w") as toWrite:
         yaml.dump(result, stream=toWrite, default_flow_style=False)
@@ -428,103 +443,11 @@ def makeLab(data, devices, testbed, outfile):
                                 entry += "\tansible_ssh_pass=" + ansible_ssh_pass
                             except:
                                 print("\t\t" + host + ": ansible_ssh_pass not found")
-                        try: #get hwsku
-                            hwsku = dev.get("hwsku")
-                            if hwsku is not None:
-                               entry += "\thwsku=" + hwsku
-                        except AttributeError:
-                            print("\t\t" + host + ": hwsku not found")
-
-                        try: #get card_type
-                            card_type = dev.get("card_type")
-                            if card_type is not None:
-                               entry += "\tcard_type=" + card_type
-                        except AttributeError:
-                           print("\t\t" + host + ": card_type not found")
-
-                        try: #get num_fabric_asics
-                            num_fabric_asics = dev.get("num_fabric_asics")
-                            if num_fabric_asics is not None:
-                               entry += "\tnum_fabric_asics=" + str( num_fabric_asics )
-                        except AttributeError:
-                            print("\t\t" + host + " num_fabric_asics not found")
-
-                        try: #get num_asics
-                            num_asics = dev.get("num_asics")
-                            if num_asics is not None:
-                               entry += "\tnum_asics=" + str( num_asics )
-                        except AttributeError:
-                            print("\t\t" + host + " num_asics not found")
-
-                        if card_type != 'supervisor':
-                           entry += "\tstart_switchid=" + str( start_switchid )
-                           if num_asic is not None:
-                              start_switchid += int( num_asic )
-                           else:
-                              start_switchid += 1
-
-                        try: #get frontend_asics
-                            frontend_asics = dev.get("frontend_asics")
-                            if frontend_asics is not None:
-                               entry += "\tfrontend_asics=" + frontend_asics.__str__()
-                        except AttributeError:
-                            print("\t\t" + host + ": frontend_asics not found")
-
-                        try: #get asics_host_ip
-                            asics_host_ip = dev.get("asics_host_ip")
-                            if asics_host_ip is not None:
-                               entry += " \tasics_host_ip=" + str( asics_host_ip )
-                        except AttributeError:
-                            print("\t\t" + host + " asics_host_ip not found")
-
-                        try: #get asics_host_ipv6
-                            asics_host_ipv6 = dev.get("asics_host_ipv6")
-                            if asics_host_ipv6 is not None:
-                               entry += "\tasics_host_ipv6=" + str( asics_host_ipv6 )
-                        except AttributeError:
-                            print("\t\t" + host + " asics_host_ipv6 not found")
-
-                        try: #get voq_inband_ip
-                            voq_inband_ip = dev.get("voq_inband_ip")
-                            if voq_inband_ip is not None:
-                               entry += "\tvoq_inband_ip=" + str( voq_inband_ip )
-                        except AttributeError:
-                            print("\t\t" + host + " voq_inband_ip not found")
-
-                        try: #get voq_inband_ipv6
-                            voq_inband_ipv6 = dev.get("voq_inband_ipv6")
-                            if voq_inband_ipv6 is not None:
-                               entry += "\tvoq_inband_ipv6=" + str( voq_inband_ipv6 )
-                        except AttributeError:
-                            print("\t\t" + host + " voq_inband_ipv6 not found")
-
-                        try: #get voq_inband_intf
-                            voq_inband_intf = dev.get("voq_inband_intf")
-                            if voq_inband_intf is not None:
-                               entry += "\tvoq_inband_intf=" + str( voq_inband_intf )
-                        except AttributeError:
-                            print("\t\t" + host + " voq_inband_intf not found")
-
-                        try: #get voq_inband_type
-                            voq_inband_type = dev.get("voq_inband_type")
-                            if voq_inband_type is not None:
-                               entry += "\tvoq_inband_type=" + str( voq_inband_type )
-                        except AttributeError:
-                            print("\t\t" + host + " voq_inband_type not found")
-
-                        try: #get switch_type
-                            switch_type = dev.get("switch_type")
-                            if switch_type is not None:
-                               entry += "\tswitch_type=" + str( switch_type )
-                        except AttributeError:
-                            print("\t\t" + host + " switch_type not found")
-
-                        try: #get max_cores
-                            max_cores = dev.get("max_cores")
-                            if max_cores is not None:
-                               entry += "\tmax_cores=" + str( max_cores )
-                        except AttributeError:
-                            print("\t\t" + host + " max_cores not found")
+                            try: # get OS type
+                                operationsystem = devices.get(host.lower()).get("os")
+                                entry += "\tos=" + operationsystem
+                            except:
+                                print("\t\t" + host + ": device operation type not found")
 
                     toWrite.write(entry + "\n")
                 toWrite.write("\n")
@@ -618,6 +541,10 @@ def updateDockerRegistry(docker_registry, outfile):
             toWrite.write("\n\n")
 
 
+def makeLabconnection_file():
+    import subprocess
+    print(subprocess.call("cd files/ && python creategraph.py -o lab_connection_graph.xml -c None -p None ", shell=True))
+
 def main():
     print("PROCESS STARTED")
     ##############################################################
@@ -686,6 +613,8 @@ def main():
     print("UPDATING FILES FROM CONFIG FILE")
     print("\tUPDATING DOCKER REGISTRY")
     updateDockerRegistry(docker_registry, args.basedir + dockerRegistry_file)
+    print("\t CREATING file lab_connection_graph.xml")
+    makeLabconnection_file()
     print("PROCESS COMPLETED")
 
 
