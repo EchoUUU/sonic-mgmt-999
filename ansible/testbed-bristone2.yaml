@@ -75,7 +75,7 @@ devices:
             password: 
             enable_password: 
         ansible:
-            ansible_host: 10.251.0.100/23
+            ansible_host: 10.200.0.100/23
             ansible_ssh_user: admin
             ansible_ssh_pass: password
 
@@ -89,7 +89,7 @@ devices:
             password: 
             enable_password: 
         ansible:
-            ansible_host: 10.251.0.235/23
+            ansible_host: 10.200.0.235/23
             ansible_ssh_user: admin
             ansible_ssh_pass: password
             fanout_sonic_user: admin
@@ -140,7 +140,7 @@ devices:
             username: clsnet
             password: 123456
         ansible:
-            ansible_host: 10.251.0.245/24
+            ansible_host: 10.200.0.245/24
             ansible_ssh_pass: 123456  
             ansible_become_pass: 123456
             sonicadmin_user: admin
@@ -156,7 +156,7 @@ devices:
             username: clsnet
             password: 123456
         ansible:
-            ansible_host: 10.251.0.245/24
+            ansible_host: 10.200.0.245/24
             ansible_ssh_pass: 123456  
             ansible_become_pass: 123456
             sonicadmin_user: admin
@@ -172,7 +172,7 @@ devices:
             username: clsnet
             password: 123456
         ansible:
-            ansible_host: 10.251.0.246/24
+            ansible_host: 10.200.0.246/24
             ansible_ssh_pass: 123456  
             ansible_become_pass: 123456
             sonicadmin_user: admin
@@ -211,7 +211,7 @@ devices:
             username:
             password:
         ansible:
-            ansible_host: 10.251.0.240/23
+            ansible_host: 10.200.0.240/23
             ansible_ssh_user: root
             ansible_ssh_pass: root
 
@@ -223,7 +223,7 @@ devices:
             username:
             password:
         ansible:
-            ansible_host: 10.251.0.241/23
+            ansible_host: 10.200.0.241/23
             ansible_ssh_user: root
             ansible_ssh_pass: root
 
@@ -235,7 +235,7 @@ devices:
             username:
             password:
         ansible:
-            ansible_host: 10.251.0.242/23
+            ansible_host: 10.200.0.242/23
             ansible_ssh_user: root
             ansible_ssh_pass: root
 
@@ -256,21 +256,21 @@ host_vars:
         external_port: ens2f1
 
     str-cels-serv-020:
-        mgmt_bridge: br2
+        mgmt_bridge: br4
         mgmt_prefixlen: 23
-        mgmt_gw: 10.251.0.2
+        mgmt_gw: 10.200.0.2
         external_port: ens4f0
 
     str-cels-serv-021:
-        mgmt_bridge: br2
+        mgmt_bridge: br4
         mgmt_prefixlen: 23
-        mgmt_gw: 10.251.0.2
+        mgmt_gw: 10.200.0.2
         external_port: ens4f0
 
     str-cels-serv-030:
-        mgmt_bridge: br2
+        mgmt_bridge: br4
         mgmt_prefixlen: 23
-        mgmt_gw: 10.251.0.2
+        mgmt_gw: 10.200.0.2
         external_port: enp6s0
 
 # veos_groups is a dictionary that contains all veos groups
@@ -338,7 +338,7 @@ veos:
     cd_image_filename: Aboot-veos-serial-8.0.0.iso                  # source: sonic-mgmt/ansible/group_vars/vm_host/main.yml
     hdd_image_filename: vEOS-lab-4.20.15M.vmdk                      # source: sonic-mgmt/ansible/group_vars/vm_host/main.yml
     skip_image_downloading: true                                   # source: sonic-mgmt/ansible/group_vars/vm_host/main.yml
-    vm_console_base: 7000                                           # source: sonic-mgmt/ansible/group_vars/vm_host/main.yml
+    vm_console_base: 8000                                           # source: sonic-mgmt/ansible/group_vars/vm_host/main.yml
     memory: 2097152                                                 # source: sonic-mgmt/ansible/group_vars/vm_host/main.yml
     max_fp_num: 4                                                   # source: sonic-mgmt/ansible/group_vars/vm_host/main.yml
     ptf_bp_ip: 10.10.246.254/24
@@ -431,87 +431,87 @@ veos:
             ansible_host: 10.250.0.33
     vms_s20:
         VM0332: 
-            ansible_host: 10.251.0.51
+            ansible_host: 10.200.0.51
         VM0333: 
-            ansible_host: 10.251.0.52
+            ansible_host: 10.200.0.52
         VM0334: 
-            ansible_host: 10.251.0.53
+            ansible_host: 10.200.0.53
         VM0335: 
-            ansible_host: 10.251.0.54
+            ansible_host: 10.200.0.54
     vms_s21:
         VM0300:
-            ansible_host: 10.251.0.2
+            ansible_host: 10.200.0.2
         VM0301:
-            ansible_host: 10.251.0.3
+            ansible_host: 10.200.0.3
         VM0302:
-            ansible_host: 10.251.0.4
+            ansible_host: 10.200.0.4
         VM0303:
-            ansible_host: 10.251.0.5
+            ansible_host: 10.200.0.5
         VM0304:
-            ansible_host: 10.251.0.6
+            ansible_host: 10.200.0.6
         VM0305:
-            ansible_host: 10.251.0.7
+            ansible_host: 10.200.0.7
         VM0306:
-            ansible_host: 10.251.0.8
+            ansible_host: 10.200.0.8
         VM0307:
-            ansible_host: 10.251.0.9
+            ansible_host: 10.200.0.9
         VM0308:
-            ansible_host: 10.251.0.10
+            ansible_host: 10.200.0.10
         VM0309:
-            ansible_host: 10.251.0.11
+            ansible_host: 10.200.0.11
         VM0310:
-            ansible_host: 10.251.0.12
+            ansible_host: 10.200.0.12
         VM0311:
-            ansible_host: 10.251.0.13
+            ansible_host: 10.200.0.13
         VM0312:
-            ansible_host: 10.251.0.14
+            ansible_host: 10.200.0.14
         VM0313:
-            ansible_host: 10.251.0.15
+            ansible_host: 10.200.0.15
         VM0314:
-            ansible_host: 10.251.0.16
+            ansible_host: 10.200.0.16
         VM0315:
-            ansible_host: 10.251.0.17
+            ansible_host: 10.200.0.17
         VM0316:
-            ansible_host: 10.251.0.18
+            ansible_host: 10.200.0.18
         VM0317:
-            ansible_host: 10.251.0.19
+            ansible_host: 10.200.0.19
         VM0318:
-            ansible_host: 10.251.0.20
+            ansible_host: 10.200.0.20
         VM0319:
-            ansible_host: 10.251.0.21
+            ansible_host: 10.200.0.21
         VM0320:
-            ansible_host: 10.251.0.22
+            ansible_host: 10.200.0.22
         VM0321:
-            ansible_host: 10.251.0.23
+            ansible_host: 10.200.0.23
         VM0322:
-            ansible_host: 10.251.0.24
+            ansible_host: 10.200.0.24
         VM0323:
-            ansible_host: 10.251.0.25
+            ansible_host: 10.200.0.25
         VM0324:
-            ansible_host: 10.251.0.26
+            ansible_host: 10.200.0.26
         VM0325:
-            ansible_host: 10.251.0.27
+            ansible_host: 10.200.0.27
         VM0326:
-            ansible_host: 10.251.0.28
+            ansible_host: 10.200.0.28
         VM0327:
-            ansible_host: 10.251.0.29
+            ansible_host: 10.200.0.29
         VM0328:
-            ansible_host: 10.251.0.30
+            ansible_host: 10.200.0.30
         VM0329:
-            ansible_host: 10.251.0.31
+            ansible_host: 10.200.0.31
         VM0330:
-            ansible_host: 10.251.0.32
+            ansible_host: 10.200.0.32
         VM0331:
-            ansible_host: 10.251.0.33
+            ansible_host: 10.200.0.33
     vms_s30:
         VM0232: 
-            ansible_host: 10.251.0.55
+            ansible_host: 10.200.0.55
         VM0233: 
-            ansible_host: 10.251.0.56
+            ansible_host: 10.200.0.56
         VM0234: 
-            ansible_host: 10.251.0.57
+            ansible_host: 10.200.0.57
         VM0235: 
-            ansible_host: 10.251.0.58
+            ansible_host: 10.200.0.58
 # testbed dictionary contains information about the testbed
 # testbed is used to generate testbed.csv
 # testbed dictionary does not cross reference with other files 
@@ -550,7 +550,7 @@ testbed:
         ptf_image_name: docker-ptf
         ptf: ptfst0
         ptf_ipv6:
-        ptf_ip: 10.251.0.240/23
+        ptf_ip: 10.200.0.240/23
         server: server_s20
         vm_base: VM0332
         dut: cel-seastone2-01
@@ -564,7 +564,7 @@ testbed:
         ptf_image_name: docker-ptf
         ptf: ptfst1
         ptf_ipv6:
-        ptf_ip: 10.251.0.241/23
+        ptf_ip: 10.200.0.241/23
         server: server_s21
         vm_base: VM0300
         dut: cel-seastone2-01
@@ -578,7 +578,7 @@ testbed:
         ptf_image_name: docker-ptf
         ptf: ptfsst0
         ptf_ipv6:
-        ptf_ip: 10.251.0.242/23
+        ptf_ip: 10.200.0.242/23
         server: server_s30
         vm_base: VM0232
         dut: cel-seastone2-01
