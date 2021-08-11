@@ -55,7 +55,7 @@ def ip_and_intf_info(config_facts, intfs_for_test):
 
     logger.info("Using {}, {}, and PTF interface {}".format(ptf_intf_ipv4_addr, ptf_intf_ipv6_addr, ptf_intf_name))
 
-    return ptf_intf_ipv4_addr, ptf_intf_ipv6_addr, ptf_intf_name 
+    yield ptf_intf_ipv4_addr, ptf_intf_ipv6_addr, ptf_intf_name
 
 
 @pytest.fixture
@@ -165,6 +165,7 @@ def test_arp_garp_enabled(rand_selected_dut, garp_enabled, ip_and_intf_info, int
     arp_src_mac = '00:00:07:08:09:0a'
     _, _, intf1_index, _, = intfs_for_test
 
+    time.sleep(5)
     pkt = testutils.simple_arp_packet(pktlen=60,
                                 eth_dst='ff:ff:ff:ff:ff:ff',
                                 eth_src=arp_src_mac,
@@ -269,6 +270,46 @@ def test_proxy_arp(proxy_arp_enabled, ip_and_intf_info, ptfadapter, packets_for_
     elif ip_version == 'v6':
         pytest_require(ptf_intf_ipv6_addr is not None, 'No IPv6 VLAN address configured on device')
 
-    ptfadapter.dataplane.flush()
-    testutils.send_packet(ptfadapter, ptf_intf_index, outgoing_packet)
-    testutils.verify_packet(ptfadapter, expected_packet, ptf_intf_index)
+    proxy_arp_config_cmd = 'config vlan proxy_arp {} {}'
+
+    # We are leveraging the fact that ping will automatically send a neighbor solicitation/ARP request for us
+    # However, we expect the ping itself to always fail since no interface is configured with the pinged IP, so add '|| true' so we can continue
+    ping_cmd = 'ping {} -I {} -c 1 || true'
+
+    # Enable proxy ARP/NDP for the VLANs on the DUT
+    vlans = config_facts['VLAN']
+    vlan_ids =[vlans[vlan]['vlanid'] for vlan in vlans.keys()]
+
+    for vid in vlan_ids:
+        duthost.shell(proxy_arp_config_cmd.format(vid, 'enabled'))
+        time.sleep(3)
+        logger.info("Enabled proxy ARP for VLAN {}".format(vid))
+
+    clear_dut_arp_cache(ptfhost)
+
+    ping_addr = None
+    if ip_version == 'v4':
+        ping_addr = increment_ipv4_addr(ptf_intf_ipv4_addr)
+    elif ip_version == 'v6':
+        ping_addr = increment_ipv6_addr(ptf_intf_ipv6_addr)
+
+    logger.info("Pinging {} using PTF interface {}".format(ping_addr, ptf_intf_name))
+    ptfhost.shell(ping_cmd.format(ping_addr, ptf_intf_name))
+    time.sleep(2)
+
+    neighbor_table = ptfhost.switch_arptable()['ansible_facts']['arptable'][ip_version]
+
+    topology = tbinfo['topo']['name']
+    if 'dualtor' in topology:
+        dut_macs = []
+
+        for vlan_details in vlans.values():
+            dut_macs.append(vlan_details['mac'])
+    else:
+        router_mac = duthost.shell('sonic-cfggen -d -v \'DEVICE_METADATA.localhost.mac\'')["stdout_lines"][0].decode("utf-8")
+        dut_macs = [router_mac]
+
+    pytest_assert(ping_addr in neighbor_table.keys())
+    pytest_assert(neighbor_table[ping_addr]['macaddress'] in dut_macs)
+    pytest_assert(neighbor_table[ping_addr]['interface'] == ptf_intf_name)
+    pytest_assert(neighbor_table[ping_addr]['state'].lower() not in ['failed', 'incomplete'])
