@@ -825,7 +825,7 @@ def test_acl_entry(duthosts, enum_rand_one_per_hwsku_frontend_hostname, enum_fro
     pytest_assert(new_crm_stats_acl_entry_used - crm_stats_acl_entry_used == 2, \
         "\"crm_stats_acl_entry_used\" counter was not incremented")
 
-    crm_stats_acl_entry_available = new_crm_stats_acl_entry_available + new_crm_stats_acl_entry_used
+    crm_stats_acl_entry_available = new_crm_stats_acl_entry_available + new_crm_stats_acl_entry_used - 1
 
     used_percent = get_used_percent(new_crm_stats_acl_entry_used, new_crm_stats_acl_entry_available)
     if used_percent < 1:
@@ -918,8 +918,12 @@ def test_acl_counter(duthosts, enum_rand_one_per_hwsku_frontend_hostname,enum_fr
     crm_stats_acl_counter_available = new_crm_stats_acl_counter_available + new_crm_stats_acl_counter_used
 
     # Verify thresholds for "ACL entry" CRM resource
-    verify_thresholds(duthost, asichost, crm_cli_res="acl group counter", crm_used=new_crm_stats_acl_counter_used,
-        crm_avail=new_crm_stats_acl_counter_available)
+    if new_crm_stats_acl_counter_available:
+        verify_thresholds(duthost, asichost, crm_cli_res="acl group counter", crm_used=new_crm_stats_acl_counter_used,
+            crm_avail=new_crm_stats_acl_counter_available)
+    else:
+        verify_thresholds(duthost, asichost, crm_cli_res="acl group counter", crm_used=new_crm_stats_acl_counter_used,
+            crm_avail=new_crm_stats_acl_counter_available+1)
 
     # Remove ACL
     duthost.command("acl-loader delete")
