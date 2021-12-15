@@ -1,6 +1,7 @@
 ---
 # This playbook will cleanup a vm_host, including removing all veos, containers and net bridges.
 
+
 - hosts: servers:&vm_host
   gather_facts: no
   tasks:
